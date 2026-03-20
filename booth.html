@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Photobooth</title>
+
+<style>
+body {
+  text-align: center;
+  font-family: sans-serif;
+  background: linear-gradient(#ff2e7a, #ff7fb5);
+}
+
+video {
+  margin-top: 20px;
+  border-radius: 10px;
+}
+
+button {
+  margin: 10px;
+  padding: 10px 15px;
+  border-radius: 20px;
+  border: none;
+  background: #fff;
+}
+
+canvas {
+  margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>📸 Photobooth</h2>
+
+<video id="video" width="250" autoplay></video>
+<br>
+
+<button onclick="start()">ถ่าย 4 รูป 💖</button>
+<button onclick="download()">ดาวน์โหลด 📥</button>
+
+<br>
+<canvas id="canvas" width="300" height="900"></canvas>
+
+<script>
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let shots = [];
+
+// เปิดกล้อง
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => video.srcObject = stream);
+
+function start(){
+  shots = [];
+  shoot(0);
+}
+
+function shoot(i){
+  if(i >= 4){
+    draw();
+    return;
+  }
+
+  setTimeout(() => {
+    let temp = document.createElement("canvas");
+    temp.width = 300;
+    temp.height = 225;
+    temp.getContext("2d").drawImage(video,0,0,300,225);
+    shots.push(temp);
+    shoot(i+1);
+  }, 1000);
+}
+
+function draw(){
+  ctx.fillStyle = "#ff2e7a";
+  ctx.fillRect(0,0,300,900);
+
+  shots.forEach((img, i)=>{
+    ctx.drawImage(img, 0, i*220 + 20, 300, 200);
+  });
+
+  ctx.fillStyle = "black";
+  ctx.font = "20px sans-serif";
+  ctx.fillText("Happy Ruka Day 2026", 40, 880);
+}
+
+function download(){
+  let link = document.createElement("a");
+  link.download = "photobooth.png";
+  link.href = canvas.toDataURL();
+  link.click();
+}
+</script>
+
+</body>
+</html>
